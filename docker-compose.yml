@@ -1,0 +1,30 @@
+services:
+  app:
+    build: ./
+    ports:
+      - "3000:3000"
+    env_file:
+    - .env
+    environment:
+      DATABASE_URL: postgres://brightpath:brightpath_pw@db:5432/brightpath_db
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U brightpath -d brightpath_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+   
