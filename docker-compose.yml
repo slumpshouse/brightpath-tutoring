@@ -1,6 +1,7 @@
 services:
   app:
     build: ./
+    restart: always
     ports:
       - "3000:3000"
     env_file:
@@ -20,6 +21,7 @@ services:
 
   db:
     image: postgres:15
+    restart: always
     environment:
       POSTGRES_USER: brightpath
       POSTGRES_PASSWORD: brightpath_pw

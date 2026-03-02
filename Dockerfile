@@ -32,6 +32,10 @@ FROM node:20-alpine
 # Set environment to production
 ENV NODE_ENV=production
 
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs \
+ && adduser  --system --uid 1001 nextjs
+
 # Set working directory
 WORKDIR /app
 
@@ -43,6 +47,18 @@ COPY --from=builder /app/.next/static ./.next/static
 
 # Copy public assets (images, icons, etc.)
 COPY --from=builder /app/public ./public
+
+# Copy Prisma schema and migrations for migrate deploy
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.pnpm node_modules/.pnpm
+COPY --from=builder /app/node_modules/prisma node_modules/prisma
+COPY --from=builder /app/node_modules/@prisma node_modules/@prisma
+
+# Set ownership to non-root user
+RUN chown -R nextjs:nodejs /app
+
+# Switch to non-root user
+USER nextjs
 
 # Expose port 3000 (Next.js default port)
 EXPOSE 3000
