@@ -10,7 +10,7 @@ on:
     branches:
       - main
       - develop
-      - feature/*"
+      - 'feature/*'
 
 jobs:
   app-quality:
@@ -54,7 +54,7 @@ jobs:
   compose-smoke-test:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: System stability
+    needs: app-quality
 
     steps:
       - name: Checkout
@@ -167,7 +167,7 @@ jobs:
   neon-prisma-migrate:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: System stability
+    needs: app-quality
 
     steps:
       - name: Checkout
