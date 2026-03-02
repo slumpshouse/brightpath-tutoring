@@ -188,6 +188,5 @@ jobs:
 
       - name: Run Prisma migrate deploy (Neon)
         env:
-          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.NEON_DIRECT_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: pnpm exec prisma migrate deploy
