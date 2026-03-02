@@ -36,6 +36,9 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs \
  && adduser  --system --uid 1001 nextjs
 
+# Install prisma CLI for running migrations inside the container
+RUN npm install -g prisma
+
 # Set working directory
 WORKDIR /app
 
@@ -50,9 +53,6 @@ COPY --from=builder /app/public ./public
 
 # Copy Prisma schema and migrations for migrate deploy
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.pnpm node_modules/.pnpm
-COPY --from=builder /app/node_modules/prisma node_modules/prisma
-COPY --from=builder /app/node_modules/@prisma node_modules/@prisma
 
 # Set ownership to non-root user
 RUN chown -R nextjs:nodejs /app
