@@ -173,25 +173,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check Neon secrets
-        id: neon
-        env:
-          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
-          NEON_DIRECT_URL: ${{ secrets.NEON_DIRECT_URL }}
-        run: |
-          if [ -n "$NEON_DATABASE_URL" ] && [ -n "$NEON_DIRECT_URL" ]; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "Neon secrets are not set. Skipping migrate deploy job steps."
-          fi
-
       - name: Setup pnpm
-        if: steps.neon.outputs.enabled == 'true'
         uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
-        if: steps.neon.outputs.enabled == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -199,11 +184,9 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        if: steps.neon.outputs.enabled == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Run Prisma migrate deploy (Neon)
-        if: steps.neon.outputs.enabled == 'true'
         env:
           DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
           DIRECT_URL: ${{ secrets.NEON_DIRECT_URL }}
