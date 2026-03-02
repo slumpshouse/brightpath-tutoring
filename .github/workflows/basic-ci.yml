@@ -18,20 +18,20 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js
+      - name: Configure Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
@@ -40,13 +40,13 @@ jobs:
           DIRECT_URL: postgresql://dummy:dummy@localhost:5432/dummy
         run: pnpm exec prisma generate
 
-      - name: Lint
+      - name: Run Linter
         run: pnpm lint
 
-      - name: Type check
+      - name: Type Check
         run: pnpm exec tsc --noEmit
 
-      - name: Build
+      - name: Build Application
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
         run: pnpm build
@@ -54,7 +54,7 @@ jobs:
   compose-smoke-test:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: app-quality
+    needs: System stability
 
     steps:
       - name: Checkout
@@ -167,7 +167,7 @@ jobs:
   neon-prisma-migrate:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: app-quality
+    needs: System stability
 
     steps:
       - name: Checkout
