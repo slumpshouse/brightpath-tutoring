@@ -86,7 +86,7 @@ jobs:
           echo "App is healthy."
 
       - name: Run Prisma Migrations
-        run: docker compose exec app prisma migrate deploy
+        run: docker compose exec app prisma migrate deploy --schema prisma/schema.prisma
 
       - name: Verify Services are Healthy
         run: docker compose ps
