@@ -44,8 +44,8 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs \
  && adduser  --system --uid 1001 nextjs
 
-# Install prisma CLI for running migrations inside the container
-RUN npm install -g prisma
+# Install prisma CLI (pinned to v6 to match project schema)
+RUN npm install -g prisma@6
 
 # Set working directory
 WORKDIR /app
