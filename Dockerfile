@@ -42,9 +42,6 @@ RUN npm install -g prisma
 # Set working directory
 WORKDIR /app
 
-# Install dotenv so prisma.config.ts can load
-RUN npm install dotenv
-
 # Copy the standalone server build from the builder stage
 COPY --from=builder /app/.next/standalone ./
 
@@ -57,6 +54,9 @@ COPY --from=builder /app/public ./public
 # Copy Prisma schema, migrations, and config for migrate deploy
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+
+# Install dotenv + tsx so prisma.config.ts can be loaded
+RUN npm install dotenv tsx
 
 # Set ownership to non-root user
 RUN chown -R nextjs:nodejs /app
