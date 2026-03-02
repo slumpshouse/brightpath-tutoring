@@ -157,7 +157,7 @@ jobs:
         run: docker compose ps
 
       - name: Show compose logs
-        if: failure()
+        if: always()
         run: docker compose logs --no-color
 
       - name: Tear down stack
