@@ -7,12 +7,20 @@ FROM node:20-alpine AS builder
 # Set the working directory inside the container
 WORKDIR /app
 
+# Provide a dummy DATABASE_URL for the build step (Prisma client generation)
+# The real URL is injected at runtime via docker-compose environment
+ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+ENV DATABASE_URL=${DATABASE_URL}
+
 # Copy package.json and pnpm-lock.yaml first
 # This allows Docker to cache dependency installation
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml prisma.config.ts ./
 
 # Install pnpm and dependencies
 RUN npm install -g pnpm && pnpm install --frozen-lockfile
+
+# Copy Prisma schema early for client generation
+COPY prisma ./prisma
 
 # Copy the rest of the application files
 COPY . .
