@@ -106,10 +106,10 @@ jobs:
       - name: Verify all migrations applied
         run: |
           echo "=== Checking migration status ==="
-          docker compose exec -T db psql -U postgres -d brightpath -c "SELECT migration_name, finished_at FROM _prisma_migrations ORDER BY finished_at;"
+          docker compose exec -T db psql -U brightpath -d brightpath_db -c "SELECT migration_name, finished_at FROM _prisma_migrations ORDER BY finished_at;"
 
           # Verify no failed migrations
-          FAILED=$(docker compose exec -T db psql -U postgres -d brightpath -t -c "SELECT COUNT(*) FROM _prisma_migrations WHERE rolled_back_at IS NOT NULL OR migration_name IS NULL;")
+          FAILED=$(docker compose exec -T db psql -U brightpath -d brightpath_db -t -c "SELECT COUNT(*) FROM _prisma_migrations WHERE rolled_back_at IS NOT NULL OR migration_name IS NULL;")
           if [ "$FAILED" -gt 0 ]; then
             echo " Found failed migrations"
             exit 1
@@ -119,10 +119,10 @@ jobs:
       - name: Verify all database tables exist
         run: |
           echo "=== All tables in database ==="
-          docker compose exec -T db psql -U postgres -d brightpath -c "\dt"
+          docker compose exec -T db psql -U brightpath -d brightpath_db -c "\dt"
 
           # Count tables (excluding Prisma internal tables)
-          TABLE_COUNT=$(docker compose exec -T db psql -U postgres -d brightpath -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name != '_prisma_migrations';")
+          TABLE_COUNT=$(docker compose exec -T db psql -U brightpath -d brightpath_db -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name != '_prisma_migrations';")
           echo "OK: Found $TABLE_COUNT application table(s)"
 
           if [ "$TABLE_COUNT" -lt 1 ]; then
@@ -133,7 +133,7 @@ jobs:
       - name: Verify database schema for all tables
         run: |
           echo "=== Schema for all tables ==="
-          docker compose exec -T db psql -U postgres -d brightpath -c "
+          docker compose exec -T db psql -U brightpath -d brightpath_db -c "
             SELECT table_name, column_name, data_type, is_nullable
             FROM information_schema.columns
             WHERE table_schema = 'public' AND table_name != '_prisma_migrations'
@@ -144,11 +144,11 @@ jobs:
         run: |
           echo "=== Testing database read/write ==="
           # Get all table names
-          TABLES=$(docker compose exec -T db psql -U postgres -d brightpath -t -c "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name != '_prisma_migrations';")
+          TABLES=$(docker compose exec -T db psql -U brightpath -d brightpath_db -t -c "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name != '_prisma_migrations';")
 
           for table in $TABLES; do
             echo "Testing table: $table"
-            docker compose exec -T db psql -U postgres -d brightpath -c "SELECT COUNT(*) as row_count FROM \"$table\";"
+            docker compose exec -T db psql -U brightpath -d brightpath_db -c "SELECT COUNT(*) as row_count FROM \"$table\";"
           done
           echo "OK: Database operations successful"
 
