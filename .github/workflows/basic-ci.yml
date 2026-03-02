@@ -18,20 +18,20 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
-      - name: Configure Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
@@ -40,13 +40,13 @@ jobs:
           DIRECT_URL: postgresql://dummy:dummy@localhost:5432/dummy
         run: pnpm exec prisma generate
 
-      - name: Run Linter
+      - name: Lint
         run: pnpm lint
 
-      - name: Type Check
+      - name: Type check
         run: pnpm exec tsc --noEmit
 
-      - name: Build Application
+      - name: Build
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
         run: pnpm build
