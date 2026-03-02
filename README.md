@@ -20,7 +20,7 @@ docker build -t brightpath-app .
 
 ```bash
 docker compose up --build
-```
+
 
 The app will be available at [http://localhost:3000](http://localhost:3000).
 
