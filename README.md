@@ -20,6 +20,8 @@ docker build -t brightpath-app .
 
 ```bash
 docker compose up --build
+```
+
 
 
 The app will be available at [http://localhost:3000](http://localhost:3000).
@@ -29,6 +31,20 @@ The app will be available at [http://localhost:3000](http://localhost:3000).
 ```bash
 docker compose down
 ```
+
+---
+
+## CI/CD (GitHub Actions)
+
+This repo uses a two-job workflow:
+
+- **build-and-test** runs on every push/PR: builds + starts Docker Compose, runs Prisma migrations, runs `pnpm test`, then tears everything down with `if: always()`.
+- **deploy** runs only when **build-and-test** passes **and** the branch is `main` (`needs: build-and-test` + `if: github.ref == 'refs/heads/main'`).
+
+Secrets are never committed to git. Instead, set GitHub Secrets whose names match the `.env.production` variables used by Compose:
+
+- `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `DATABASE_URL`
+- EC2 deploy secrets: `EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`, `EC2_APP_DIR` (SSH defaults to port 22)
 
 ---
 
